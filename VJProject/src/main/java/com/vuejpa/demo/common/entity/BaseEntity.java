@@ -14,12 +14,11 @@ import jakarta.persistence.PreUpdate;
 import lombok.Getter;
 
 @Getter
-/** JPA Entity 클래스들이 해당 
- * entity 상속 시 필드도 칼럼으로 인식하도록 */
+/** 공통 속성을 상속할 수 있도록 구현한 추상 클래스 */
 @MappedSuperclass
 /** 해당 클래스에 Auditing 기능 포함시킴 */
 @EntityListeners(AuditingEntityListener.class)
-public abstract class TimeEntity {
+public abstract class BaseEntity {
 	
 	@CreatedDate
 	@Column(updatable = false)

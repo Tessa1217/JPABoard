@@ -1,6 +1,6 @@
 package com.vuejpa.demo.board.entity;
 
-import com.vuejpa.demo.common.entity.TimeEntity;
+import com.vuejpa.demo.common.entity.BaseEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 	sequenceName = "TBL_BOARD_ID_SEQ",
 	allocationSize = 1
 )
-public class Board extends TimeEntity {
+public class Board extends BaseEntity {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="SEQ_GENERATOR")

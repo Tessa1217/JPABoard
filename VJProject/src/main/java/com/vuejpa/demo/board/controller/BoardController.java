@@ -1,7 +1,14 @@
 package com.vuejpa.demo.board.controller;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.vuejpa.demo.board.entity.Board;
 import com.vuejpa.demo.board.entity.BoardRequestDTO;
 import com.vuejpa.demo.board.entity.BoardResponseDTO;
 import com.vuejpa.demo.board.service.BoardService;
@@ -26,10 +34,17 @@ public class BoardController {
 	}
 	
 	// 게시글 목록 조회
-	@RequestMapping(value="/selectBoardList.do", method=RequestMethod.POST)
+	@RequestMapping(value="/selectBoardList.do")
 	@ResponseBody
-	public List<BoardResponseDTO> selectBoardList() {
-		return boardService.selectBoardList();
+	public Map<String, Object> selectBoardList(@PageableDefault(sort="id", direction=Sort.Direction.DESC) Pageable pageable) {
+		Map<String, Object> resultMap = new HashMap<>();
+		Page<Board> pageList = boardService.selectBoardList(pageable);
+		List<BoardResponseDTO> boardList = pageList.stream().map(BoardResponseDTO::new).collect(Collectors.toList());
+		resultMap.put("boardList", boardList);
+		resultMap.put("totalPage", pageList.getTotalPages());
+		resultMap.put("pageSize", pageable.getPageSize());
+		resultMap.put("pageNumber", pageable.getPageNumber());
+		return resultMap;
 	}
 
 	// 게시물 상세조회

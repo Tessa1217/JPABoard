@@ -1,11 +1,7 @@
 package com.vuejpa.demo.board.service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.springframework.data.domain.Sort;
-import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.vuejpa.demo.board.entity.Board;
@@ -25,11 +21,10 @@ public class BoardService {
 		this.boardRepository = boardRepository;
 	}
 	
-	// 게시물 목록 조회
-	public List<BoardResponseDTO> selectBoardList() {
-		Sort sort = Sort.by(Direction.DESC, "id");
-		List<Board> boardList = boardRepository.findAll(sort);
-		return boardList.stream().map(BoardResponseDTO::new).collect(Collectors.toList());
+	// 게시물 목록 조회 (페이징)
+	public Page<Board> selectBoardList(Pageable pageable) {
+		// 삭제 게시물은 제외
+		return boardRepository.findByDelYn("N", pageable);
 	}
 	
 	// 게시물 정보 조회
