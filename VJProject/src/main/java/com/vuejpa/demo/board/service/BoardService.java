@@ -24,7 +24,7 @@ public class BoardService {
 	// 게시물 목록 조회 (페이징)
 	public Page<Board> selectBoardList(Pageable pageable) {
 		// 삭제 게시물은 제외
-		return boardRepository.findByDelYn("N", pageable);
+		return boardRepository.getBoardList(pageable);
 	}
 	
 	// 게시물 정보 조회
