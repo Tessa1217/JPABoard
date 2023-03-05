@@ -10,16 +10,13 @@ import com.vuejpa.demo.board.entity.BoardResponseDTO;
 import com.vuejpa.demo.board.repository.BoardRepository;
 
 import jakarta.transaction.Transactional;
+import lombok.AllArgsConstructor;
 
 @Service
+@AllArgsConstructor
 public class BoardService {
 	
 	private final BoardRepository boardRepository;
-	
-	// 생성자 주입
-	public BoardService(BoardRepository boardRepository) {
-		this.boardRepository = boardRepository;
-	}
 	
 	// 게시물 목록 조회 (페이징)
 	public Page<Board> selectBoardList(Pageable pageable) {
