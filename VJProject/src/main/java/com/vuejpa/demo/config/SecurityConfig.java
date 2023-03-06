@@ -1,16 +1,18 @@
 package com.vuejpa.demo.config;
 
-import java.util.Arrays;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.reactive.CorsConfigurationSource;
-import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.vuejpa.demo.common.util.Aes256Utils;
 import com.vuejpa.demo.jwt.JwtAccessDeniedHandler;
 import com.vuejpa.demo.jwt.JwtAuthenticationEntryPoint;
 import com.vuejpa.demo.jwt.JwtSecurityConfig;
@@ -27,23 +29,34 @@ public class SecurityConfig {
 	private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 	private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 	
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+    	return new BCryptPasswordEncoder();
+    }
+    
+	
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 		http
+			.cors()
+			.and()
 		    .csrf().disable()
+		    .sessionManagement()
+		    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+		    .and()
+		    .authorizeHttpRequests()
+			.requestMatchers("/", "/**").permitAll()
+			.requestMatchers("/css/**").permitAll()
+			.requestMatchers("/js/**").permitAll()
+			.requestMatchers("/favicon/**").permitAll()
+			.requestMatchers("/users/**").permitAll()
+			.requestMatchers("/board").permitAll()
+			.requestMatchers("/board/select**").permitAll()
+		    .anyRequest().authenticated()
+		    .and()
 		    .exceptionHandling()
 		    .authenticationEntryPoint(jwtAuthenticationEntryPoint)
 		    .accessDeniedHandler(jwtAccessDeniedHandler)
-		    .and()
-		    .authorizeHttpRequests()
-		    .requestMatchers("/").permitAll()
-		    .requestMatchers("/css/**").permitAll()
-		    .requestMatchers("/js/**").permitAll()
-		    .requestMatchers("/favicon/**").permitAll()
-		    .requestMatchers("/users/**").permitAll()
-		    .requestMatchers("/board").permitAll()
-		    .requestMatchers("/board/select**").permitAll()
-		    .anyRequest().authenticated()
 		    .and()
 			.apply(new JwtSecurityConfig(tokenProvider));
 		return http.build();
@@ -51,11 +64,12 @@ public class SecurityConfig {
 	
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
+		final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedOrigins(Arrays.asList("http://localhost:8080", "http://localhost:9000"));
-		configuration.setAllowedMethods(Arrays.asList("GET", "POST"));
 		configuration.addAllowedHeader("*");
-		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		configuration.addAllowedMethod("*");
+		configuration.addAllowedOriginPattern("*");
+		configuration.setAllowCredentials(true);
         source.registerCorsConfiguration("/**", configuration);
         return source;
 	}

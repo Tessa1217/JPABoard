@@ -12,6 +12,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -25,12 +26,13 @@ public class JwtFilter extends GenericFilterBean {
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 		HttpServletRequest httpServletRequest = (HttpServletRequest) request;
+		HttpServletResponse httpServletResponse = (HttpServletResponse) response;
 		String jwt = resolveToken(httpServletRequest);
 		if(StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
 			Authentication authentication = tokenProvider.getAuthentication(jwt);
 			SecurityContextHolder.getContext().setAuthentication(authentication);
-		} 
-		chain.doFilter(request, response);
+		}
+		chain.doFilter(httpServletRequest, httpServletResponse);
 	}
 	
 	private String resolveToken(HttpServletRequest request) {

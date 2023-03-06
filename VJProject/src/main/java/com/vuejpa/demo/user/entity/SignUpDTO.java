@@ -1,31 +1,27 @@
 package com.vuejpa.demo.user.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class UserRequestDTO {
-	
-	private String id;
-	
-	private String password;
+@AllArgsConstructor
+@Builder
+public class SignUpDTO {
 	
 	private String name;
 	
-	@Builder
-	public UserRequestDTO(String id, String password, String name) {
-		this.id = id;
-		this.password = password;
-		this.name = name;
-	}
+	private String password;
+	
+	private String nickname;
 	
 	public User toEntity() {
 		return User.builder()
-		    .id(this.id)
-		    .password(this.password)
 		    .name(this.name)
+		    .password(this.password)
+		    .nickname(this.nickname)
 		    .build();
 	}
 	
