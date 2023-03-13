@@ -14,9 +14,10 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.vuejpa.demo.jwt.JwtFilter;
 import com.vuejpa.demo.jwt.TokenProvider;
+import com.vuejpa.demo.jwt.entity.TokenResponseDTO;
+import com.vuejpa.demo.jwt.service.RefreshTokenService;
 import com.vuejpa.demo.user.entity.LoginDTO;
 import com.vuejpa.demo.user.entity.SignUpDTO;
-import com.vuejpa.demo.user.entity.TokenDTO;
 import com.vuejpa.demo.user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -28,6 +29,7 @@ public class UserController {
 	private final TokenProvider tokenProvider;
 	private final AuthenticationManagerBuilder authenticationManagerBuilder;
 	private final UserService userService;
+	private final RefreshTokenService refreshTokenService;
 	
 	@RequestMapping(value="/users/signUp.do")
 	@ResponseBody
@@ -44,22 +46,17 @@ public class UserController {
 	
 	@RequestMapping(value="/users/login.do")
 	@ResponseBody
-	public ResponseEntity<TokenDTO> login(@RequestBody LoginDTO loginDTO) {
+	public ResponseEntity<TokenResponseDTO> login(@RequestBody LoginDTO loginDTO) {
+
 		UsernamePasswordAuthenticationToken authenticationToken =
 				             new UsernamePasswordAuthenticationToken(loginDTO.getName(), loginDTO.getPassword());
-		System.out.println(authenticationToken.getCredentials());
 		// AuthenticationToken을 이용하여 authenticate가 실행될 때 UserService의 loadUserByUsername 실행
-		System.out.println("===========");
 		Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-		System.out.println("===========");
 		SecurityContextHolder.getContext().setAuthentication(authentication);
-		
-		String jwt = tokenProvider.createToken(authentication);
-		
+		TokenResponseDTO tokenResponseDTO = tokenProvider.createToken(authentication);
 		HttpHeaders httpHeaders = new HttpHeaders();
-		httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
-		
-		return new ResponseEntity<>(new TokenDTO(jwt), httpHeaders, HttpStatus.OK);
+		httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, tokenResponseDTO.getTokenType() + tokenResponseDTO.getAccessToken());
+		return new ResponseEntity<>(tokenResponseDTO, httpHeaders, HttpStatus.OK);
 	}
 	
 

@@ -16,6 +16,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 
+import com.vuejpa.demo.jwt.entity.TokenResponseDTO;
+import com.vuejpa.demo.jwt.service.RefreshTokenService;
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -26,20 +29,27 @@ import io.jsonwebtoken.security.Keys;
 
 @Component
 public class TokenProvider implements InitializingBean {
-	// InitializingBean을 implement
 	
+	// InitializingBean을 implement
 	private static final String AUTHORITIES_KEY = "auth";
 	
 	private final String secret;
-	private final long tokenValidityInMilliseconds;
+	private final long accessTokenValidityInMilliseconds;
+	private final long refreshTokenValidityInMilliseconds;
+	
+	private final RefreshTokenService refreshTokenService;
 	
 	private Key key;
 	
 	public TokenProvider(
 			@Value("${jwt.secret}") String secret,
-			@Value("${jwt.token-validity-in-seconds}") long tokenValidityInSeconds) {
+			@Value("${jwt.access-token-validity-in-seconds}") long accessTokenValidityInSeconds,
+			@Value("${jwt.refresh-token-validity-in-seconds}") long refreshTokenValidityInSeconds,
+			RefreshTokenService refreshTokenService) {
 				this.secret = secret;
-				this.tokenValidityInMilliseconds = tokenValidityInSeconds * 1000;
+				this.accessTokenValidityInMilliseconds = accessTokenValidityInSeconds * 1000;
+				this.refreshTokenValidityInMilliseconds = refreshTokenValidityInSeconds * 1000;
+				this.refreshTokenService = refreshTokenService;
 	}
 
 	@Override
@@ -49,20 +59,37 @@ public class TokenProvider implements InitializingBean {
 		this.key = Keys.hmacShaKeyFor(keyBytes);
 	}
 	
-	public String createToken(Authentication authentication) {
+	public TokenResponseDTO createToken(Authentication authentication) {
 		// Authorization 객체의 권한 정보를 이용해서 토큰 생성 
 		String authorities = authentication.getAuthorities().stream()
 				                           .map(GrantedAuthority::getAuthority)
 				                           .collect(Collectors.joining(","));
+		String userName = authentication.getName();
+		String accessToken = createAccessToken(userName, authorities);
+		String refreshToken = createRefreshToken();
+		return new TokenResponseDTO(accessToken, refreshToken);
+	}
+	
+	private String createAccessToken(String userName, String authorities) {
 		long now = (new Date()).getTime();
-		Date validity = new Date(now + this.tokenValidityInMilliseconds);
-		
-		return Jwts.builder()
-				   .setSubject(authentication.getName())
-				   .claim(AUTHORITIES_KEY, authorities)
-				   .signWith(key, SignatureAlgorithm.HS256)
-				   .setExpiration(validity)
-				   .compact();
+		Date validity = new Date(now + this.accessTokenValidityInMilliseconds);
+		String accessToken = Jwts.builder()
+                .setSubject(userName)
+                .claim(AUTHORITIES_KEY, authorities)
+                .setExpiration(validity)
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
+		return accessToken;
+	}
+	
+	private String createRefreshToken() {
+		long now = (new Date()).getTime();
+		Date validity = new Date(now + this.refreshTokenValidityInMilliseconds);
+		String refreshToken = Jwts.builder()
+				                  .setExpiration(validity)
+				                  .signWith(key, SignatureAlgorithm.HS256)
+				                  .compact();
+		return refreshToken;
 	}
 	
 	public Authentication getAuthentication(String token) {

@@ -23,7 +23,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@SuppressWarnings("serial")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -34,7 +33,7 @@ import lombok.NoArgsConstructor;
 	sequenceName = "TBL_USER_NO_SEQ",
 	allocationSize = 1
 )
-public class User implements UserDetails {
+public class User {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_GENERATOR")
@@ -54,52 +53,13 @@ public class User implements UserDetails {
 	@Convert(converter = UserRoleConverter.class)
 	@Column(name="USER_ROLE")
 	private Role role;
-
-	@Override
-	public String getUsername() {
-		return this.name;
-	}
-
-	@Override
-	public boolean isAccountNonExpired() {
-		return true;
-	}
-
-	@Override
-	public boolean isAccountNonLocked() {
-		return true;
-	}
-
-	@Override
-	public boolean isCredentialsNonExpired() {
-		return true;
-	}
-
-	@Override
-	public boolean isEnabled() {
-		return true;
-	}
-
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		Collection<GrantedAuthority> authorities = new ArrayList<>();
-		for(String role : this.role.getValue().split(",")) {
-			authorities.add(new SimpleGrantedAuthority(role));
-		}
-		return authorities;
-	}
-
-	@Override
-	public String getPassword() {
-		return this.password;
+	
+	public void encodedPassword(String password) {
+		this.password = password;
 	}
 	
 	public void addRole(Role role) {
 		this.role = role;
-	}
-	
-	public void encodedPassword(String password) {
-		this.password = password;
 	}
 
 }

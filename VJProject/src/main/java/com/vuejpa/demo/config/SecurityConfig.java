@@ -1,5 +1,7 @@
 package com.vuejpa.demo.config;
 
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -12,7 +14,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.vuejpa.demo.common.util.Aes256Utils;
 import com.vuejpa.demo.jwt.JwtAccessDeniedHandler;
 import com.vuejpa.demo.jwt.JwtAuthenticationEntryPoint;
 import com.vuejpa.demo.jwt.JwtSecurityConfig;
@@ -28,6 +29,12 @@ public class SecurityConfig {
 	private final TokenProvider tokenProvider;
 	private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 	private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+	private String[] requestWhiteList = {"/",
+			                             "/css/**",
+			                             "/js/**",
+			                             "/favicon/**",
+			                             "/users/**",
+			                             };
 	
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -37,28 +44,25 @@ public class SecurityConfig {
 	
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http
-			.cors()
-			.and()
-		    .csrf().disable()
-		    .sessionManagement()
-		    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-		    .and()
-		    .authorizeHttpRequests()
-			.requestMatchers("/", "/**").permitAll()
-			.requestMatchers("/css/**").permitAll()
-			.requestMatchers("/js/**").permitAll()
-			.requestMatchers("/favicon/**").permitAll()
-			.requestMatchers("/users/**").permitAll()
-			.requestMatchers("/board").permitAll()
-			.requestMatchers("/board/select**").permitAll()
-		    .anyRequest().authenticated()
+		http.httpBasic().disable();
+		
+		http.csrf().disable();
+		
+		http.cors().configurationSource(corsConfigurationSource());
+		
+		http.sessionManagement()
+		    .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		
+		http.authorizeHttpRequests()
+		    .requestMatchers(requestWhiteList).permitAll()
+		    .anyRequest().authenticated();
+		
+		http.apply(new JwtSecurityConfig(tokenProvider))
 		    .and()
 		    .exceptionHandling()
 		    .authenticationEntryPoint(jwtAuthenticationEntryPoint)
-		    .accessDeniedHandler(jwtAccessDeniedHandler)
-		    .and()
-			.apply(new JwtSecurityConfig(tokenProvider));
+		    .accessDeniedHandler(jwtAccessDeniedHandler);
+		   
 		return http.build();
 	}
 	
