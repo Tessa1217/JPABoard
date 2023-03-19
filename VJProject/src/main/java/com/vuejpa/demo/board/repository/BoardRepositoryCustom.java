@@ -8,4 +8,7 @@ import com.vuejpa.demo.board.entity.Board;
 public interface BoardRepositoryCustom {
 
 	public Page<Board> getBoardList(Pageable pageable);
+	
+	public Board getBoardDetail(Long id);
+
 }

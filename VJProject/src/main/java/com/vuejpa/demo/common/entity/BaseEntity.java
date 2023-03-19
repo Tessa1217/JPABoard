@@ -25,6 +25,7 @@ public abstract class BaseEntity {
 	private LocalDateTime regDate;
 	
 	@LastModifiedDate
+	@Column(insertable = false)
 	private LocalDateTime modDate;
 	
 	@PrePersist

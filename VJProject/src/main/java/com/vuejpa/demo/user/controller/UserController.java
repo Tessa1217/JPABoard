@@ -1,5 +1,8 @@
 package com.vuejpa.demo.user.controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -7,10 +10,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.vuejpa.demo.jwt.JwtFilter;
 import com.vuejpa.demo.jwt.TokenProvider;
@@ -22,8 +25,9 @@ import com.vuejpa.demo.user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
+@RequestMapping(name = "/users", method = RequestMethod.POST)
 public class UserController {
 	
 	private final TokenProvider tokenProvider;
@@ -32,20 +36,20 @@ public class UserController {
 	private final RefreshTokenService refreshTokenService;
 	
 	@RequestMapping(value="/users/signUp.do")
-	@ResponseBody
-	public String signUp(@RequestBody SignUpDTO signUpDTO) {
-		String result = "";
+	public Map<String, Object> signUp(@RequestBody SignUpDTO signUpDTO) {
+		Map<String, Object> resultMap = new HashMap<String, Object>();
 		Long id = userService.signUp(signUpDTO);
 		if(id == null) {
-			result = "failed";
+			resultMap.put("result", "failed");
+			resultMap.put("msg", "회원가입에 실패하셨습니다.");
 		} else {
-			result = "success";
+			resultMap.put("result", "success");
+			resultMap.put("msg", "회원가입에 성공하셨습니다.");
 		}
-		return result;
+		return resultMap;
 	}
 	
 	@RequestMapping(value="/users/login.do")
-	@ResponseBody
 	public ResponseEntity<TokenResponseDTO> login(@RequestBody LoginDTO loginDTO) {
 
 		UsernamePasswordAuthenticationToken authenticationToken =

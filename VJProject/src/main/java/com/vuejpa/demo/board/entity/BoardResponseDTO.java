@@ -21,6 +21,10 @@ public class BoardResponseDTO {
 	
 	private LocalDateTime modDate;
 	
+	private String userName;
+	
+	private String writer;
+	
 	public BoardResponseDTO(Board entity) {
 		this.id = entity.getId();
 		this.title = entity.getTitle();
@@ -29,6 +33,8 @@ public class BoardResponseDTO {
 		this.delYn = entity.getDelYn();
 		this.regDate = entity.getRegDate();
 		this.modDate = entity.getModDate();
+		this.userName = entity.getUser().getName();
+		this.writer = entity.getUser().getNickname();
 	}
 
 }

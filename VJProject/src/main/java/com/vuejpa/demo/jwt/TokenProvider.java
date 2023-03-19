@@ -70,7 +70,7 @@ public class TokenProvider implements InitializingBean {
 		String userName = authentication.getName();
 		String accessToken = createAccessToken(userName, authorities);
 		String refreshToken = createRefreshToken();
-		return new TokenResponseDTO(accessToken, refreshToken);
+		return new TokenResponseDTO(userName, accessToken, refreshToken);
 	}
 	
 	private String createAccessToken(String userName, String authorities) {

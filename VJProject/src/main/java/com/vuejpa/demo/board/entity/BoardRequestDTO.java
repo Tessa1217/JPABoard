@@ -1,5 +1,7 @@
 package com.vuejpa.demo.board.entity;
 
+import com.vuejpa.demo.user.entity.User;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,6 +18,8 @@ public class BoardRequestDTO {
 	
 	private String delYn;
 	
+	private User user;
+	
 	@Builder
 	public BoardRequestDTO(String title, String content, Integer viewCnt, String delYn) {
 		this.title = title;
@@ -24,12 +28,17 @@ public class BoardRequestDTO {
 		this.delYn = delYn;
 	}
 	
+	public void setUser(User user) {
+		this.user = user;
+	}
+	
 	public Board toEntity() {
 		return Board.builder()
 				    .title(title)
 				    .content(content)
 				    .viewCnt(viewCnt)
 				    .delYn(delYn)
+				    .user(user)
 				    .build();
 	}
 

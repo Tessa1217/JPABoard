@@ -12,8 +12,11 @@ public class TokenResponseDTO {
 	private String refreshToken;
 
 	private String tokenType = "Bearer ";
+	
+	private String userName;
 
-	public TokenResponseDTO(String accessToken, String refreshToken) {
+	public TokenResponseDTO(String userName, String accessToken, String refreshToken) {
+		this.userName = userName;
 		this.accessToken = accessToken;
 		this.refreshToken = refreshToken;
 	}

@@ -14,11 +14,14 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Builder
 @Getter
+@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name="TBL_BOARD")
@@ -51,12 +54,8 @@ public class Board extends BaseEntity {
 	@JoinColumn(name = "USER_ID")
 	private User user;
 	
-	@Builder
-	public Board(String title, String content, Integer viewCnt, String delYn) {
-		this.title = title;
-		this.content = content;
-		this.viewCnt = viewCnt;
-		this.delYn = delYn;
+	public void setUser(User user) {
+		this.user = user;
 	}
 	
 	public void updateBoard(String title, String content) {
