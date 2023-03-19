@@ -22,6 +22,8 @@ import com.vuejpa.demo.board.entity.BoardRequestDTO;
 import com.vuejpa.demo.board.entity.BoardResponseDTO;
 import com.vuejpa.demo.board.service.BoardService;
 
+import jakarta.servlet.http.HttpServletRequest;
+
 @Controller
 @RequestMapping("/board")
 public class BoardController {
@@ -36,7 +38,7 @@ public class BoardController {
 	// 게시글 목록 조회
 	@RequestMapping(value="/selectBoardList.do")
 	@ResponseBody
-	public Map<String, Object> selectBoardList(@PageableDefault(sort="id", direction=Sort.Direction.DESC) Pageable pageable) {
+	public Map<String, Object> selectBoardList(@PageableDefault(sort="id", direction=Sort.Direction.DESC) Pageable pageable) {		
 		Map<String, Object> resultMap = new HashMap<>();
 		Page<Board> pageList = boardService.selectBoardList(pageable);
 		List<BoardResponseDTO> boardList = pageList.stream().map(BoardResponseDTO::new).collect(Collectors.toList());

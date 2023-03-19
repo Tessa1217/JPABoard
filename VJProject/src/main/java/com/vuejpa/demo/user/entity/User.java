@@ -1,20 +1,17 @@
 package com.vuejpa.demo.user.entity;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import java.util.HashSet;
+import java.util.Set;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -49,17 +46,19 @@ public class User {
 	@Column(name="USER_NICKNAME")
 	private String nickname;
 	
-	@Enumerated(value = EnumType.STRING)
-	@Convert(converter = UserRoleConverter.class)
-	@Column(name="USER_ROLE")
-	private Role role;
+	// 권한 변경 (2023.03.19)
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(name = "TBL_COMM_USER_ROLES",
+	           joinColumns = @JoinColumn(name = "USER_ID"),
+	           inverseJoinColumns = @JoinColumn(name = "ROLE_ID"))
+	private Set<Role> roles = new HashSet<>();
 	
 	public void encodedPassword(String password) {
 		this.password = password;
 	}
 	
-	public void addRole(Role role) {
-		this.role = role;
+	public void setRoles(Set<Role> roles) {
+		this.roles = roles;
 	}
 
 }

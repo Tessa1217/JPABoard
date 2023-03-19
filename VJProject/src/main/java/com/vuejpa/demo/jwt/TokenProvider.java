@@ -7,6 +7,8 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.stream.Collectors;
 
+import javax.crypto.SecretKey;
+
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,6 +27,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 
 @Component
@@ -90,6 +93,15 @@ public class TokenProvider implements InitializingBean {
 				                  .signWith(key, SignatureAlgorithm.HS256)
 				                  .compact();
 		return refreshToken;
+	}
+	
+	public String getUserNameFromJwtToken(String token) {
+		return Jwts.parserBuilder()
+				   .setSigningKey(key)
+				   .build()
+				   .parseClaimsJws(token)
+				   .getBody()
+				   .getSubject();
 	}
 	
 	public Authentication getAuthentication(String token) {
