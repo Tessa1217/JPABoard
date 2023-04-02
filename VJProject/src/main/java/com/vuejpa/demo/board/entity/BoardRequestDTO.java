@@ -14,18 +14,16 @@ public class BoardRequestDTO {
 	
 	private String content;
 	
-	private Integer viewCnt;
+	private Integer viewCnt = 0;
 	
-	private String delYn;
+	private String delYn = "N";
 	
 	private User user;
 	
 	@Builder
-	public BoardRequestDTO(String title, String content, Integer viewCnt, String delYn) {
+	public BoardRequestDTO(String title, String content) {
 		this.title = title;
 		this.content = content;
-		this.viewCnt = viewCnt;
-		this.delYn = delYn;
 	}
 	
 	public void setUser(User user) {

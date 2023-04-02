@@ -1,5 +1,9 @@
 package com.vuejpa.demo.board.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.vuejpa.demo.comment.entity.Comment;
 import com.vuejpa.demo.common.entity.BaseEntity;
 import com.vuejpa.demo.user.entity.User;
 
@@ -12,6 +16,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -53,6 +58,9 @@ public class Board extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "USER_ID")
 	private User user;
+	
+	@OneToMany(mappedBy="board", fetch = FetchType.LAZY)
+	private List<Comment> commentList = new ArrayList<>();
 	
 	public void setUser(User user) {
 		this.user = user;

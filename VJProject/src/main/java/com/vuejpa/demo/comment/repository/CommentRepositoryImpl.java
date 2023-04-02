@@ -13,14 +13,6 @@ public class CommentRepositoryImpl implements CommentRepositoryCustom {
 	
 	private final JPAQueryFactory queryFactory;
 	
-	private final BoardRepository boardRepository;
-	
-	private final CommentRepository commentRepository;
-	
 	QComment comment = QComment.comment;
-	
-	QBoard board = QBoard.board;
-	
-	QUser user = QUser.user;
 	
 }
