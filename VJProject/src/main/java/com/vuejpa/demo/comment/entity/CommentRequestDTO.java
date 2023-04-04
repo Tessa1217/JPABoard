@@ -27,4 +27,8 @@ public class CommentRequestDTO {
 				      .build();
 	}
 
+	public void setUser(User user) {
+		this.user = user;
+	}
+
 }
